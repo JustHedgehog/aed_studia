@@ -149,41 +149,40 @@ else:
     print("Brak danych do wykresu.")
 
 # Zadanie 4
-from datetime import datetime
-
-import requests
-from bs4 import BeautifulSoup
 
 url = "https://www.timeanddate.com/weather/poland/poznan"
 
 response = requests.get(url)
+
 soup = BeautifulSoup(response.text, 'html.parser')
 
 # Pobierz bieżącą temperaturę
 current_temp_today = soup.find("div", class_="h2").getText(strip=True)
 
+
+
 # Pobierz temperaturę na jutro
-day_temp_tommorow_index = None
+
+soup_today_name = soup.find("table", id="wt-48").find("thead").find_all("tr")[0].find_all("th")[1]
+
+if soup_today_name.has_attr('colspan') and '4' in soup_today_name['colspan']:
+    day_temp_tommorow_index = 4
+else:
+    day_temp_tommorow_index = 0
+
+print(soup_today_name)
+
 day_temp_tommorow_headers = soup.find("table", id="wt-48").find("thead").find_all("tr")[1].find_all("th")
 for i, tag in enumerate(day_temp_tommorow_headers):
-    if tag.name == 'th':
+    if tag.name == 'th' and tag.has_attr('class') and 'sep-l' in tag['class']:
         span = tag.find('span')
         if span and span.text.strip() == 'Night':
-            day_temp_tommorow_index = i
+            day_temp_tommorow_index += i
             break
 
+print(day_temp_tommorow_index)
 day_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[day_temp_tommorow_index].getText(strip=True)
-
-night_temp_tommorow_index = None
-night_temp_tommorow_headers = soup.find("table", id="wt-48").find("thead").find_all("tr")[1].find_all("th")
-for i, tag in enumerate(night_temp_tommorow_headers):
-    if tag.name == 'th':
-        span = tag.find('span')
-        if span and span.text.strip() == 'Morning':
-            night_temp_tommorow_index = i
-            break
-
-night_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[1].getText(strip=True)
+night_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[day_temp_tommorow_index-1].getText(strip=True)
 
 # Bieżąca data
 now = datetime.now()
