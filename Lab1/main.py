@@ -149,6 +149,11 @@ else:
     print("Brak danych do wykresu.")
 
 # Zadanie 4
+from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
+
 url = "https://www.timeanddate.com/weather/poland/poznan"
 
 response = requests.get(url)
@@ -158,7 +163,26 @@ soup = BeautifulSoup(response.text, 'html.parser')
 current_temp_today = soup.find("div", class_="h2").getText(strip=True)
 
 # Pobierz temperaturę na jutro
-day_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[2].getText(strip=True)
+day_temp_tommorow_index = None
+day_temp_tommorow_headers = soup.find("table", id="wt-48").find("thead").find_all("tr")[1].find_all("th")
+for i, tag in enumerate(day_temp_tommorow_headers):
+    if tag.name == 'th':
+        span = tag.find('span')
+        if span and span.text.strip() == 'Night':
+            day_temp_tommorow_index = i
+            break
+
+day_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[day_temp_tommorow_index].getText(strip=True)
+
+night_temp_tommorow_index = None
+night_temp_tommorow_headers = soup.find("table", id="wt-48").find("thead").find_all("tr")[1].find_all("th")
+for i, tag in enumerate(night_temp_tommorow_headers):
+    if tag.name == 'th':
+        span = tag.find('span')
+        if span and span.text.strip() == 'Morning':
+            night_temp_tommorow_index = i
+            break
+
 night_temp_tommorow = soup.find("table", id="wt-48").find("tbody").find_all("tr")[1].find_all("td")[1].getText(strip=True)
 
 # Bieżąca data
