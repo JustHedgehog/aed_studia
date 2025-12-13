@@ -1,3 +1,5 @@
 .venv
 .idea
 netflix_titles.csv
+DATA.csv
+data
