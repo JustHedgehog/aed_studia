@@ -1,0 +1,1 @@
+Ze względu na kompatybilność bibliotek polecamy używać pythona 3.10 oraz pandas w wersji 1.26.4, scikit-learn-extra w wersji 0.3
